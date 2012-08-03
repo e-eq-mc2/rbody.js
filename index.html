@@ -1,40 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-  <meta charset="utf-8" />
+	<meta charset="utf-8" />
+	<link rel="stylesheet" type="text/css" href="css/html5reset-1.6.1.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="js/webgl-debug.js"></script>
+	<script type="text/javascript" src="js/glMatrix-0.9.5.min.js"></script>
+	<script type="text/javascript" src="js/webgl-util.js"></script>
+	<script type="text/javascript" src="js/rbody.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	<title>rbody.js</title>
+	<script id="vertexShader" type="x-shader/x-vertex">
+attribute vec3 vertex;
+attribute vec3 normal;
+attribute vec2 texCoord;
 
-  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
-       Remove this if you use the .htaccess -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat3 normalMatrix;
 
-  <title>index</title>
-  <meta name="description" content="" />
-  <meta name="author" content="nk-nishizawa" />
+uniform bool enableLighting;
+uniform bool enableTexture;
 
-  <meta name="viewport" content="width=device-width; initial-scale=1.0" />
+uniform vec3 lightDirection;
+uniform vec4 lightSourceDiffuse;
+uniform vec4 lightSourceAmbient;
+uniform vec4 lightSourceSpecular;
+uniform vec4 frontMaterialDiffuse;
+uniform vec4 frontMaterialAmbient;
+uniform vec4 frontMaterialSpeculer;
+uniform vec4 color;
 
-  <!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+varying vec4 vFrontColor;
+varying vec2 vTexCoord;
+
+void main() {
+	gl_Position = projectionMatrix * modelViewMatrix * vec4(vertex, 1.0);
+	if (enableLighting) {
+		vec4 diffuse = frontMaterialDiffuse * lightSourceDiffuse;
+		vec3 n = normalize(normalMatrix * normal);
+		vec3 l = normalize(lightDirection);
+		float NdotL = max(dot(n, l), 0.0);
+		vFrontColor = vec4(NdotL, NdotL, NdotL, 1.0) * diffuse + frontMaterialAmbient;
+	} else {
+		vFrontColor = color;
+	}
+	if (enableTexture) {
+		vTexCoord = texCoord;
+	}
+}
+	</script>
+	<script id="fragmentShader" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform bool enableTexture;
+uniform bool enableLighting;
+
+uniform sampler2D texSampler;
+
+varying vec4 vFrontColor;
+varying vec2 vTexCoord;
+
+void main() {
+	if (enableTexture) {
+		vec4 texColor = texture2D(texSampler, vTexCoord);
+		vec4 color = vFrontColor * texColor;
+		//vec4 color = vec4(vFrontColor.rgb * (1.0-texColor.a), 1.0);
+		if (color.a == 0.0) {
+			discard;
+		} else {
+			gl_FragColor = color;
+		}
+	} else {
+		gl_FragColor = vFrontColor;
+	}
+}
+	</script>
 </head>
 
 <body>
-  <div>
-    <header>
-      <h1>index</h1>
-    </header>
-    <nav>
-      <p><a href="/">Home</a></p>
-      <p><a href="/contact">Contact</a></p>
-    </nav>
-
-    <div>
-      
-    </div>
-
-    <footer>
-     <p>&copy; Copyright  by nk-nishizawa</p>
-    </footer>
-  </div>
+	<div id="screen">
+		<div id="canvasArea">
+			<canvas id="webglCanvas"></canvas>
+		</div>
+		<div id="textArea">
+			<h1>Rigid-body Simulation</h1>
+			<div id="info"></div>
+		</div>
+	</div>
 </body>
 </html>
