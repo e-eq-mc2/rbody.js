@@ -9,11 +9,11 @@ function RbodySystem() {
 	var dt        = 1 / 100;
 	var radius    =  1 / 10;
 	var mass      =    1.00;
-	var Kspring   = 2000.00;
+	var Kspring   = 3000.00;
 	var Kdamping  =   10.00;
-	var Kfriction =    1.00;
+	var Kfriction =    5.00;
 	var ga        = [0, -9.8, 0];
-	var x0        = [ -1, -1, -1];
+	var x0        = [ -1, -2, -1];
 	var x1        = [  1,  2,  1];
 	
 	this.initialize(
@@ -56,9 +56,9 @@ RbodySystem.prototype.initialize = function (
 	}
 	initFace(this.bound, x0, x1);
 
-	////////////////////
-	// local function //
-	////////////////////
+	//////////////
+	// Particle //
+	//////////////
 	function Particle() {
 		this.x = V3.O();
 		this.v = V3.O();
@@ -92,7 +92,7 @@ RbodySystem.prototype.initialize = function (
 		dst[15] = m33;
 		return dst;
 	};
-	function initParticle(body, nx, ny, nz, r, x0, x1) {
+	function initParticle(particle, nx, ny, nz, r, x0, x1) {
 		var vary = 0.05;
 		var diameter = r + r;
 		var distance = diameter * (1 + vary);
@@ -107,15 +107,18 @@ RbodySystem.prototype.initialize = function (
 			for (var j=0, y=oy; j < ny; ++j, y+=distance) {
 				for (var i=0, x=ox; i < nx; ++i, x+=distance) {
 					var noise = (Math.random() - 0.5) * vary * diameter;
-					body[ii].x[0] = x + noise;
-					body[ii].x[1] = y + noise;
-					body[ii].x[2] = z + noise;
+					particle[ii].x[0] = x + noise;
+					particle[ii].x[1] = y + noise;
+					particle[ii].x[2] = z + noise;
 					++ii;
 				}
 			} 
 		}
 	}
 
+	//////////
+	// Face //
+	//////////
 	function Face () {
 		this.x = V3.O();
 		this.n = V3.O();
