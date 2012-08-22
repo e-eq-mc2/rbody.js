@@ -5,7 +5,7 @@
 "use strict";
 	
 function initGL(canvas) {
-	var DEBUG_MODE = false;
+	var DEBUG_MODE = true;
 
 	var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); // A || B : if (A == true) return A else return B
 	if ( !gl ) {
@@ -17,10 +17,10 @@ function initGL(canvas) {
 	gl.viewportHeight = canvas.height;
 
 	if (DEBUG_MODE) {
+		console.log("webgl: DEBUG MODE");
 		return WebGLDebugUtils.makeDebugContext(gl);
-	} else {
-		return gl;
 	}
+	return gl;
 }
 
 function initShaders(gl, idVertexShader, idFragmentShader) {
@@ -90,7 +90,6 @@ function initShaders(gl, idVertexShader, idFragmentShader) {
 		return prgObj;
 	}
 };
-
 
 var ArrayBuffer = function () {/* base class */};
 ArrayBuffer.prototype.initialize = function (buffer, bufferUsage, attLocation, dataStride, dataType) {
@@ -169,23 +168,23 @@ function ElementArrayBuffer1us(gl) {
 }
 ElementArrayBuffer1us.prototype = new ElementArrayBuffer();
 
-function Tex2DBuffer(gl, texUnit, uniLocation) {
-	this.initialize(gl, texUnit, uniLocation);
+function Tex2DBuffer(gl, textureUnit, uniLocation) {
+	this.initialize(gl, textureUnit, uniLocation);
 }
-Tex2DBuffer.prototype.initialize = function (gl, texUnit, uniLocation) {
+Tex2DBuffer.prototype.initialize = function (gl, textureUnit, uniLocation) {
 	this.img = new Image();
-	this.texObj  = gl.createTexture();
-	this.texUnit = texUnit;
+	this.texuture    = gl.createTexture();
+	this.textureUnit = textureUnit;
 	this.uniLocation = uniLocation;
 };
 Tex2DBuffer.prototype.setBuffer= function (gl, src) {
-	var img    = this.img;
-	var texObj = this.texObj;
+	var img = this.img;
+	var texuture = this.texuture;
 	this.img.onload = function () {
 		console.log("webgl: Image finish loading ... " + new Date().toLocaleString());
 		
 		console.log("webgl: bind texture object to current TO(TEXTURE_2D) ...");
-		gl.bindTexture(gl.TEXTURE_2D, texObj);
+		gl.bindTexture(gl.TEXTURE_2D, texuture);
 		console.log("webgl: attach image data to point(TEXTURE_2D) ...");
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
 		
@@ -207,15 +206,60 @@ Tex2DBuffer.prototype.setBuffer= function (gl, src) {
 	console.log("webgl: Image begin loading .... " + new Date().toLocaleString());
 };
 Tex2DBuffer.prototype.bind = function (gl) {
-	gl.activeTexture(gl[ "TEXTURE" + this.texUnit ]);
-	gl.bindTexture(gl.TEXTURE_2D, this.texObj);
+	gl.activeTexture(gl[ "TEXTURE" + this.textureUnit ]);
+	gl.bindTexture(gl.TEXTURE_2D, this.texuture);
 	
-	gl.uniform1i(this.uniLocation, this.texUnit);
+	gl.uniform1i(this.uniLocation, this.textureUnit);
 };
 Tex2DBuffer.prototype.unbind = function (gl) {
 	gl.activeTexture(gl.TEXTURE0);
 	//gl.bindTexture(gl.TEXTURE_2D, null);
-}
+};
+
+var FrameBuffer = function (gl, width, height) {
+	this.initialize(gl, width, height);
+};
+FrameBuffer.prototype.initialize = function (gl, width, height) {
+	this.width  = width;
+	this.height = height;
+
+	// init texutre
+	this.colorBuffer    = gl.createTexture();
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.colorBuffer);  
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null /* allocate only */);
+
+	// init renderbuffer
+	// renderbuffer is not used, but it is nesessory to depth test
+	this.depthBuffer    = gl.createRenderbuffer();
+	gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
+	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+
+	// init framebuffer
+	// framebuffer == logical buffer == color + depth + stencil (default : window-system-provided)
+	this.frameBuffer = gl.createFramebuffer(); 
+	gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer);
+	gl.framebufferTexture2D   (gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D  , this.colorBuffer, 0); // attach frame buffer(color) -> texture
+	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT , gl.RENDERBUFFER, this.depthBuffer   ); // attach frame buffer(depth) -> render buffer
+
+	gl.bindTexture(g.TEXTURE_2D, null);
+	gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+		alert('ERROR: Incomplete frame buffer object');
+	}
+};
+FrameBuffer.prototype.bind = function() {
+  this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
+};
+FrameBuffer.prototype.unbind = function() {
+  this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+};
 
 function Mat4Stack() {
 	var _ary = new Array();
@@ -331,7 +375,7 @@ function WireCube(x0, x1) {
 	}
 }
 
-function Board(width, height) {
+function BoardZ(width, height) {
 	this.vertex   = new Float32Array(4 * 3);
 	this.texCoord = new Float32Array(4 * 2); 
 	this.index    = new Uint16Array(6);

@@ -4,7 +4,7 @@
 
 "use strict";
 
-$(function () {
+$(function (bb) {
 	var canvas = $("#webglCanvas").get(0);
 	canvas.width  = $("#canvasArea").width();
 	canvas.height = $("#canvasArea").height();	
@@ -36,7 +36,6 @@ $(function () {
 		texSampler            : gl.getUniformLocation(prgObj, "texSampler"           )
 	};
 	
-	var radius = rbSys.radius;
 	var sphere = new SolidSphere(rbSys.radius, 12, 6);
 	var sphereBuf = {
 		vertex   : new ArrayBuffer3f(gl, att.vertex),
@@ -51,20 +50,6 @@ $(function () {
 	sphereBuf.index   .setBuffer(gl, sphere.index    );
 	sphereBuf.tex2D   .setBuffer(gl, "img/sintai.png");
 
-	var width  = rbSys.radius * 2;
-	var height = rbSys.radius * 2;
-	var board = new Board(width, height);
-	var boardBuf = {
-		vertex   : new ArrayBuffer3f(gl, att.vertex),
-		texCoord : new ArrayBuffer2f(gl, att.texCoord),
-		index    : new ElementArrayBuffer1us(gl),
-		tex2D    : new Tex2DBuffer(gl, 1, uni.texSampler)
-	};
-	boardBuf.vertex  .setBuffer(gl, board.vertex   );
-	boardBuf.texCoord.setBuffer(gl, board.texCoord );
-	boardBuf.index   .setBuffer(gl, board.index    );
-	boardBuf.tex2D   .setBuffer(gl, "img/karada1.png");
-	
 	var cube = new WireCube([-1, -2, -1], [ 1,  2,  1]);
 	var cubeBuf = {
 		vertex : new ArrayBuffer3f(gl, att.vertex),
@@ -79,7 +64,6 @@ $(function () {
 	var angle = 0;
 	var timer0 = new Timer();
 	var timer1 = new Timer();
-	var numBody = rbSys.body.length;
 
 	(function drawLoop() {
 		timer0.start();
@@ -96,8 +80,8 @@ $(function () {
 		rbSys.update();
 		timer1.stop();
 
-		var   pM = mat4.frustum(-1, 1, -1, 1, 5, 40);
-		var  mvM = mat4.identity(mat4.create());
+		var  pM = mat4.frustum(-1, 1, -1, 1, 5, 40);
+		var mvM = mat4.identity(mat4.create());
 		mat4.translate(mvM, [0, 0, -15]); // mvM = mvM * T
 		mat4.rotate(mvM, deg2rad(   30), [1, 0, 0]); // mvM = mvM * R
 		mat4.rotate(mvM, deg2rad(angle), [0, 1, 0]); // mvM = mvM * R
@@ -105,7 +89,7 @@ $(function () {
 		// projection matrix
 		gl.uniformMatrix4fv(uni.projectionMatrix, false, pM);
 
-		// Shpere
+		// Sphere
 		gl.uniform1i(uni.enableLighting, 1);
 		gl.uniform1i(uni.enableTexture , 0);
 		gl.uniform3fv(uni.lightDirection      , [0.0, 0.0, 1.0     ]);
@@ -117,7 +101,7 @@ $(function () {
 		sphereBuf.texCoord.bind(gl);
 		sphereBuf.index   .bind(gl);
 		sphereBuf.tex2D   .bind(gl);
-		for (var i=0; i < numBody; ++i) {
+		for (var i=0; i < rbSys.body.length; ++i) {
 			var bi = rbSys.body[i];
 			var mvMBody = bi.toGLM4x4();
 			mat4.multiply(mvM, mvMBody, mvMBody); // mvM(body) = mvM(global) * mvM(body)
@@ -132,30 +116,6 @@ $(function () {
 		sphereBuf.index   .unbind(gl);
 		sphereBuf.tex2D   .unbind(gl);
 
-		/*
-		// Board
-		gl.uniform1i(uni.enableLighting, 0);
-		gl.uniform1i(uni.enableTexture , 1);
-		gl.uniform4fv(uni.color, [0, 0, 0, 1]);
-		boardBuf.vertex  .bind(gl);
-		boardBuf.texCoord.bind(gl);
-		boardBuf.index   .bind(gl);
-		boardBuf.tex2D   .bind(gl);
-		for (var i=0; i < numBody; ++i) {
-			var bi = rbSys.body[i];
-			var mvMBody = bi.toGLM4x4();
-			mat4.multiply(mvM, mvMBody, mvMBody); // mvM(body) = mvM(global) * mvM(body)
-
-			gl.uniformMatrix4fv(uni.modelViewMatrix, false,             mvMBody);
-			gl.uniformMatrix3fv(uni.normalMatrix   , false, normalMat3(mvMBody));
-			gl.drawElements(gl.TRIANGLES, board.index.length, gl.UNSIGNED_SHORT, 0);
-		}
-		boardBuf.vertex  .unbind(gl);
-		boardBuf.texCoord.unbind(gl);
-		boardBuf.index   .unbind(gl);
-		boardBuf.tex2D   .unbind(gl);
-		*/
-
 		// Cube
 		gl.uniform1i(uni.enableLighting, 0);
 		gl.uniform1i(uni.enableTexture , 0);
@@ -168,14 +128,13 @@ $(function () {
 		cubeBuf.index .unbind(gl);
 		
 		gl.flush();
+		++loop;
 		
 		timer0.stop();
 		var err = gl.getError();
 		if (err != gl.NO_ERROR && err != gl.CONTEXT_LOST_WEBGL) {
 			alert( WebGLDebugUtils.glEnumToString(err) );
 		}
-
-		++loop;
 		
 		var ela0 = Math.ceil(timer0.elapsedMsec());
 		var ave0 = Math.ceil(timer0.elapsedTotalMsec() / loop);
@@ -189,7 +148,7 @@ $(function () {
 		ave0 = num2str(ave0, 4);
 		ave1 = num2str(ave1, 4);
 		$("#info").html(
-			'<p>' + numBody + ' bodies, step: ' + loop + '</p>' +
+			'<p>' + rbSys.body.length + ' bodies, step: ' + loop + '</p>' +
 			'<p>' +  'R-body Elapsed: ' + ela1 + ' msec ' + '(ave. ' +  ave1 + ')' + '</p>' +
 			'<p>' +  '+WebGL Elapsed: ' + ela0 + ' msec ' + '(ave. ' +  ave0 + ')' + '</p>'
 		);

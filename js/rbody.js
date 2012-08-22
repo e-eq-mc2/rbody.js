@@ -262,10 +262,8 @@ RbodySystem.prototype.updateMomentum = function() {
 
 RbodySystem.prototype.updateState = function () {
 	var numBody = this.body.length;
-	var dt        = this.dt;
-	var invMass   = 1 / this.mass;
-	var invI0     = this.invI0;
-
+	var dt      = this.dt;
+	var invMass = 1 / this.mass;
 	for (var i=0; i < numBody; ++i) {
 		var xi = this.body[i].x;
 		var vi = this.body[i].v;
@@ -283,41 +281,6 @@ RbodySystem.prototype.updateState = function () {
 	}
 };
 
-/*
-RbodySystem.prototype.updateBucket = function () {
-	var bucket    = this.bucket;
-	var dim = this.bucketDim;
-	var x0  = this.bucketX0;
-	var x1  = this.bucketX1;
-	
-	var szx = (x1[0] - x0[0]) / bucketDim[0];
-	var szy = (x1[1] - x0[1]) / bucketDim[1];
-	var szz = (x1[2] - x0[2]) / bucketDim[2];
-	var invSzx = 1 / szx;
-	var invSzy = 1 / szy;
-	var invSzz = 1 / szz;
-	
-	var dimxy = dim[0] * dim[1];
-	var dimX  = dim[0];
-	
-	for (var i=0; i < numBody; ++i) {
-		var xi = this.body[i].x;
-		
-		var x = xi[0] - x0x;
-		var y = xi[1] - x0y;
-		var z = xi[2] - x0z;
-		
-		var ix = Math.floor(xi[0] / szx );
-		var iy = Math.floor(xi[1] / szy );
-		var iz = Math.floor(xi[2] / szz );
-		
-		var b = dimxy * iz + dimx * iy + ix;
-		
-		bucket[b].push(i);
-	}
-};
-*/
-
 /* 
  * 
  * Vector 3
@@ -328,14 +291,14 @@ V3.create = function (x, y, z) {
 	return [x, y, z];
 };
 V3.set = function (x, y, z, dst) {
-	if (! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = x;
 	dst[1] = y;
 	dst[2] = z;
 	return dst;
 };
 V3.O = function (dst) {
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = 0;
 	dst[1] = 0;
 	dst[2] = 0;
@@ -345,7 +308,7 @@ V3.add = function (v0, v1, dst) {
 	var x = v0[0] + v1[0];
 	var y = v0[1] + v1[1];
 	var z = v0[2] + v1[2];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = x;
 	dst[1] = y;
 	dst[2] = z;
@@ -355,7 +318,7 @@ V3.sub = function (v0, v1, dst) {
 	var x = v0[0] - v1[0];
 	var y = v0[1] - v1[1];
 	var z = v0[2] - v1[2];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = x;
 	dst[1] = y;
 	dst[2] = z;
@@ -365,7 +328,7 @@ V3.scale = function (v, s, dst) {
 	var x = s * v[0];
 	var y = s * v[1];
 	var z = s * v[2];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = x;
 	dst[1] = y;
 	dst[2] = z;
@@ -375,7 +338,7 @@ V3.negate = function (v, dst) {
 	var x = - v[0];
 	var y = - v[1];
 	var z = - v[2];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = x;
 	dst[1] = y;
 	dst[2] = z;
@@ -386,7 +349,7 @@ V3.normalize = function (v, dst) {
 	var y = v[1];
 	var z = v[2];
 	var invL = 1.0 / Math.sqrt(x*x + y*y + z*z);
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = invL * x;
 	dst[1] = invL * y;
 	dst[2] = invL * z;
@@ -396,7 +359,7 @@ V3.cross = function (v0, v1, dst) {
 	var x = v0[1]*v1[2] - v0[2]*v1[1];
 	var y = v0[2]*v1[0] - v0[0]*v1[2];
 	var z = v0[0]*v1[1] - v0[1]*v1[0];	
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = x;
 	dst[1] = y;
 	dst[2] = z;
@@ -422,21 +385,21 @@ M3x3.create = function (m00, m01, m02, m10, m11, m12, m20, m21, m22) {
 	return [m00, m01, m02, m10, m11, m12, m20, m21, m22];
 };
 M3x3.set = function (m00, m01, m02, m10, m11, m12, m20, m21, m22, dst) {
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = m00; dst[1] = m01; dst[2] = m02;
 	dst[3] = m10; dst[4] = m11; dst[5] = m12;
 	dst[6] = m20; dst[7] = m21; dst[8] = m22;
 	return dst;
 };
 M3x3.I = function (dst) {
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = 1; dst[1] = 0; dst[2] = 0;
 	dst[3] = 0; dst[4] = 1; dst[5] = 0;
 	dst[6] = 0; dst[7] = 0; dst[8] = 1;
 	return dst;
 };
 M3x3.O = function (dst) {
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = 0; dst[1] = 0; dst[2] = 0;
 	dst[3] = 0; dst[4] = 0; dst[5] = 0;
 	dst[6] = 0; dst[7] = 0; dst[8] = 0;
@@ -455,7 +418,7 @@ M3x3.MM = function (m0, m1, dst) {
 	var m20 = m0[6]*m1[0] + m0[7]*m1[3] + m0[8]*m1[6];
 	var m21 = m0[6]*m1[1] + m0[7]*m1[4] + m0[8]*m1[7];
 	var m22 = m0[6]*m1[2] + m0[7]*m1[5] + m0[8]*m1[8];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = m00; dst[1] = m01; dst[2] = m02;
 	dst[3] = m10; dst[4] = m11; dst[5] = m12;
 	dst[6] = m20; dst[7] = m21; dst[8] = m22;
@@ -465,7 +428,7 @@ M3x3.MV = function (m, v, dst) {
 	var x = m[0]*v[0] + m[1]*v[1] + m[2]*v[2];
 	var y = m[3]*v[0] + m[4]*v[1] + m[5]*v[2];
 	var z = m[6]*v[0] + m[7]*v[1] + m[8]*v[2];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = x;
 	dst[1] = y;
 	dst[2] = z;
@@ -484,7 +447,7 @@ M3x3.transpose = function (m, dst) {
 	var m20 = m[2];
 	var m21 = m[5];
 	var m22 = m[8];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = m00; dst[1] = m01; dst[2] = m02;
 	dst[3] = m10; dst[4] = m11; dst[5] = m12;
 	dst[6] = m20; dst[7] = m21; dst[8] = m22;
@@ -498,7 +461,7 @@ M3x3.transpose = function (m, dst) {
  */
 var Q4 = {};
 Q4.O = function (dst) {
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = 0;
 	dst[1] = 0;
 	dst[2] = 0;
@@ -518,7 +481,7 @@ Q4.add = function (q0, q1, dst) {
 	var x = q0[1] + q1[1];
 	var y = q0[2] + q1[2];
 	var z = q0[3] + q1[3];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = w;
 	dst[1] = x;
 	dst[2] = y;
@@ -526,7 +489,7 @@ Q4.add = function (q0, q1, dst) {
 	return dst;
 }
 Q4.set = function (w, x, y, z, dst) {
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = w;
 	dst[1] = x;
 	dst[2] = y;
@@ -541,7 +504,7 @@ Q4.make = function (axisX, axisY, axisZ, angle, dst) {
 	var x = s * axisX;
 	var y = s * axisY;
 	var z = s * axisZ;
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = w;
 	dst[1] = x;
 	dst[2] = y;
@@ -553,7 +516,7 @@ Q4.scale = function (q, s, dst) {
 	var x = s * q[1];
 	var y = s * q[2];
 	var z = s * q[3];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = w;
 	dst[1] = x;
 	dst[2] = y;
@@ -565,7 +528,7 @@ Q4.mul = function (q0, q1, dst) {
 	var x = q0[2] * q1[3] - q0[3] * q1[2] + q0[0] * q1[1] + q0[1] * q1[0];
 	var y = q0[3] * q1[1] - q0[1] * q1[3] + q0[0] * q1[2] + q0[2] * q1[0];
 	var z = q0[1] * q1[2] - q0[2] * q1[1] + q0[0] * q1[3] + q0[3] * q1[0];
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = w;
 	dst[1] = x;
 	dst[2] = y;
@@ -578,7 +541,7 @@ Q4.normalize = function(q, dst) {
 	var y = q[2];
 	var z = q[3];
 	var invL = 1 / Math.sqrt(x*x + y*y + z*z + w*w);
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = invL * w;
 	dst[1] = invL * x;
 	dst[2] = invL * y;
@@ -614,7 +577,7 @@ Q4.toM3x3 = function (q, dst) {
 	var m20 = xz2 - wy2;
 	var m21 = yz2 + wx2;
 	var m22 = 1 - xx2 - yy2;
-	if ( ! dst ) dst = [];
+	if (! dst) dst = [];
 	dst[0] = m00; dst[1] = m01; dst[2] = m02; // row 0
 	dst[3] = m10; dst[4] = m11; dst[5] = m12; // row 1
 	dst[6] = m20; dst[7] = m21; dst[8] = m22; // row 2
