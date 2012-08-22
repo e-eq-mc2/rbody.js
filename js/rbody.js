@@ -5,16 +5,16 @@
 "use strict";
 
 function RbodySystem() {
-	var nx = 8, ny =16, nz = 8;
+	var nx = 4, ny =32, nz = 4;
 	var dt        = 1 / 100;
-	var radius    =  1 / 10;
+	var radius    =  1 / 12;
 	var mass      =    1.00;
 	var Kspring   = 3000.00;
 	var Kdamping  =   10.00;
-	var Kfriction =    5.00;
+	var Kfriction =    4.00;
 	var ga        = [0, -9.8, 0];
-	var x0        = [ -1, -2, -1];
-	var x1        = [  1,  2,  1];
+	var x0        = [ -1, -1, -1];
+	var x1        = [  1, 10,  1];
 	
 	this.initialize(
 		nx, ny, nz,

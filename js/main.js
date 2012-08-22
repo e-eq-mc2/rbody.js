@@ -50,7 +50,7 @@ $(function (bb) {
 	sphereBuf.index   .setBuffer(gl, sphere.index    );
 	sphereBuf.tex2D   .setBuffer(gl, "img/sintai.png");
 
-	var cube = new WireCube([-1, -2, -1], [ 1,  2,  1]);
+	var cube = new WireCube([-1, -1, -1], [ 1,  1,  1]);
 	var cubeBuf = {
 		vertex : new ArrayBuffer3f(gl, att.vertex),
 		index  : new ElementArrayBuffer1us(gl)
@@ -59,7 +59,7 @@ $(function (bb) {
 	cubeBuf.index .setBuffer(gl, cube.index );
 	
 	var MAX_LOOP = 5000;
-	var TIME_OUT =   10;
+	var TIME_OUT = 20;
 	var loop  = 0;
 	var angle = 0;
 	var timer0 = new Timer();
@@ -82,8 +82,8 @@ $(function (bb) {
 
 		var  pM = mat4.frustum(-1, 1, -1, 1, 5, 40);
 		var mvM = mat4.identity(mat4.create());
-		mat4.translate(mvM, [0, 0, -15]); // mvM = mvM * T
-		mat4.rotate(mvM, deg2rad(   30), [1, 0, 0]); // mvM = mvM * R
+		mat4.translate(mvM, [0, -1, -15]); // mvM = mvM * T
+		mat4.rotate(mvM, deg2rad(   10), [1, 0, 0]); // mvM = mvM * R
 		mat4.rotate(mvM, deg2rad(angle), [0, 1, 0]); // mvM = mvM * R
 
 		// projection matrix
@@ -141,7 +141,7 @@ $(function (bb) {
 		var ela1 = Math.ceil(timer1.elapsedMsec());
 		var ave1 = Math.ceil(timer1.elapsedTotalMsec() / loop);
 		
-		//angle += 360 / 20 * Math.max(ave0, TIME_OUT) / 1000;
+		angle += 360 / 20 * Math.max(ave0, TIME_OUT) / 1000;
 		
 		ela0 = num2str(ela0, 4);
 		ela1 = num2str(ela1, 4);
