@@ -1,5 +1,6 @@
-This is a **WebGL** demo based on **Rigid-body Simulation**.
+rbody.js - a WebGL demo
 ========
+This is a **WebGL** demo based on **Rigid-body Simulation**.
 
 Quick Start
 --------
