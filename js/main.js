@@ -48,7 +48,7 @@ $(function (bb) {
 	sphereBuf.normal  .setBuffer(gl, sphere.normal   );
 	sphereBuf.texCoord.setBuffer(gl, sphere.texCoord );
 	sphereBuf.index   .setBuffer(gl, sphere.index    );
-	sphereBuf.tex2D   .setBuffer(gl, "img/sintai.png");
+	sphereBuf.tex2D   .setBuffer(gl, "img/sintai0.png");
 
 	var cube = new WireCube([-1, -1, -1], [ 1,  1,  1]);
 	var cubeBuf = {
@@ -94,7 +94,7 @@ $(function (bb) {
 		gl.uniform1i(uni.enableTexture , 0);
 		gl.uniform3fv(uni.lightDirection      , [0.0, 0.0, 1.0     ]);
 		gl.uniform4fv(uni.lightSourceDiffuse  , [1.0, 1.0, 1.0, 1.0]);
-		gl.uniform4fv(uni.frontMaterialDiffuse, [1.0, 1.0, 1.0, 1.0]);
+		gl.uniform4fv(uni.frontMaterialDiffuse, [0.5, 0.5, 0.5, 1.0]);
 		gl.uniform4fv(uni.frontMaterialAmbient, [0.1, 0.1, 0.1, 1.0]);
 		sphereBuf.vertex  .bind(gl);
 		sphereBuf.normal  .bind(gl);

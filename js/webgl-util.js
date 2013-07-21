@@ -5,8 +5,8 @@
 "use strict";
 	
 function initGL(canvas) {
-	//var DEBUG_MODE = true;
-	var DEBUG_MODE = false;
+	var DEBUG_MODE = true;
+	//var DEBUG_MODE = false;
 
 	var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); // A || B : if (A == true) return A else return B
 	if ( !gl ) {
