@@ -235,9 +235,9 @@ RbodySystem.prototype.updateMomentum = function() {
 	// local function //
 	////////////////////
 	function updateFi(radius, overlap, n, v, Ks, Kd, Kf, fi) {
-		var rx = radius * n[0];
-		var ry = radius * n[1];
-		var rz = radius * n[2];
+//		var rx = radius * n[0];
+//		var ry = radius * n[1];
+//		var rz = radius * n[2];
 
 		var lvn = v[0] * n[0] + v[1] * n[1] + v[2] * n[2];
 		var vnx = lvn * n[0];
@@ -487,7 +487,7 @@ Q4.add = function (q0, q1, dst) {
 	dst[2] = y;
 	dst[3] = z;
 	return dst;
-}
+};
 Q4.set = function (w, x, y, z, dst) {
 	if (! dst) dst = [];
 	dst[0] = w;

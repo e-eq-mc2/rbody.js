@@ -3,15 +3,14 @@
  */
 
 "use strict";
-	
+
 function initGL(canvas) {
-	var DEBUG_MODE = true;
-	//var DEBUG_MODE = false;
+	var DEBUG_MODE = false;
 
 	var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); // A || B : if (A == true) return A else return B
 	if ( !gl ) {
-		alert('ERROR: not support "webgl" | "experimental-webgl"');
-		return;
+		alert('ERROR: WebGL is not available on your browser...orz');
+		return null;
 	}
 	//set view port
 	gl.viewportWidth  = canvas.width ;
@@ -92,20 +91,20 @@ function initShaders(gl, idVertexShader, idFragmentShader) {
 	}
 };
 
-var ArrayBuffer = function () {/* base class */};
-ArrayBuffer.prototype.initialize = function (buffer, bufferUsage, attLocation, dataStride, dataType) {
+var ArrayBufferBase = function () {/* base class */};
+ArrayBufferBase.prototype.initialize = function (buffer, bufferUsage, attLocation, dataStride, dataType) {
 	this.buffer      = buffer;
 	this.bufferUsage = bufferUsage; 
 	this.attLocation = attLocation;
 	this.dataStride  = dataStride;
 	this.dataType    = dataType;
 };
-ArrayBuffer.prototype.setBuffer = function (gl, data) {
+ArrayBufferBase.prototype.setBuffer = function (gl, data) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 	gl.bufferData(gl.ARRAY_BUFFER, data, this.bufferUsage);
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 };
-ArrayBuffer.prototype.bind = function (gl) {
+ArrayBufferBase.prototype.bind = function (gl) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 	gl.enableVertexAttribArray(this.attLocation);
 	gl.vertexAttribPointer(
@@ -115,7 +114,7 @@ ArrayBuffer.prototype.bind = function (gl) {
 		false, 0, 0
 	);
 };
-ArrayBuffer.prototype.unbind = function (gl) {
+ArrayBufferBase.prototype.unbind = function (gl) {
 	gl.disableVertexAttribArray(this.attLocation);
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 };
@@ -130,7 +129,7 @@ function ArrayBuffer3f(gl, attLocation) {
 		gl.FLOAT
 	);
 }
-ArrayBuffer3f.prototype = new ArrayBuffer();
+ArrayBuffer3f.prototype = new ArrayBufferBase();
 
 function ArrayBuffer2f(gl, attLocation) {
 	this.initialize(
@@ -142,22 +141,22 @@ function ArrayBuffer2f(gl, attLocation) {
 		gl.FLOAT
 	);
 }
-ArrayBuffer2f.prototype = new ArrayBuffer();
+ArrayBuffer2f.prototype = new ArrayBufferBase();
 
-var ElementArrayBuffer = function () {/* base class */};
-ElementArrayBuffer.prototype.initialize = function (buffer, bufferUsage) {
+var ElementArrayBufferBase = function () {/* base class */};
+ElementArrayBufferBase.prototype.initialize = function (buffer, bufferUsage) {
 	this.buffer      = buffer;
 	this.bufferUsage = bufferUsage; 
 };
-ElementArrayBuffer.prototype.setBuffer = function (gl, data) {
+ElementArrayBufferBase.prototype.setBuffer = function (gl, data) {
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, this.bufferUsage);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
-ElementArrayBuffer.prototype.bind = function (gl) {
+ElementArrayBufferBase.prototype.bind = function (gl) {
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer);
 };
-ElementArrayBuffer.prototype.unbind = function (gl) {
+ElementArrayBufferBase.prototype.unbind = function (gl) {
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
@@ -167,7 +166,7 @@ function ElementArrayBuffer1us(gl) {
 		gl.STATIC_DRAW
 	);
 }
-ElementArrayBuffer1us.prototype = new ElementArrayBuffer();
+ElementArrayBuffer1us.prototype = new ElementArrayBufferBase();
 
 function Tex2DBuffer(gl, textureUnit, uniLocation) {
 	this.initialize(gl, textureUnit, uniLocation);
@@ -282,7 +281,7 @@ function normalMat3(m) {
 	return mat3.transpose(invM); // nM = ( mvM ^-1 ) ^t
 }
 
-function SolidSphere(radius, divX, divY) {
+function SolidSpherex(radius, divX, divY) {
 	var numX = divX + 1; // num vertex x
 	var numY = divY + 1; // num vertex y
 	this.vertex   = new Float32Array(numX * numY * 3);

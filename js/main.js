@@ -10,6 +10,7 @@ $(function (bb) {
 	canvas.height = $("#canvasArea").height();	
 	
 	var gl = initGL(canvas);
+	if ( !gl ) return;
 	var prgObj = initShaders(gl, "vertexShader", "fragmentShader");
 	
 	var rbSys = new RbodySystem();
@@ -21,7 +22,7 @@ $(function (bb) {
 	};
 	var uni = {
 		projectionMatrix      : gl.getUniformLocation(prgObj, "projectionMatrix"     ),
-		modelViewMatrix       : gl.getUniformLocation(prgObj, "modelViewMatrix"      ), 
+		modelViewMatrix       : gl.getUniformLocation(prgObj, "modelViewMatrix"      ),
 		normalMatrix          : gl.getUniformLocation(prgObj, "normalMatrix"         ),
 		enableLighting        : gl.getUniformLocation(prgObj, "enableLighting"       ),
 		enableTexture         : gl.getUniformLocation(prgObj, "enableTexture"        ),
@@ -36,7 +37,7 @@ $(function (bb) {
 		texSampler            : gl.getUniformLocation(prgObj, "texSampler"           )
 	};
 	
-	var sphere = new SolidSphere(rbSys.radius, 12, 6);
+	var sphere = new SolidSpherex(rbSys.radius, 12, 6);
 	var sphereBuf = {
 		vertex   : new ArrayBuffer3f(gl, att.vertex),
 		normal   : new ArrayBuffer3f(gl, att.normal),
